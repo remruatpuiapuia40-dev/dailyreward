@@ -47,7 +47,7 @@ input{width:100%;padding:12px;border-radius:10px;border:none;margin-bottom:10px;
 <div class="stat"><b id="streak">0</b><p>Day Streak 🔥</p></div>
 <div class="stat"><b id="ads">0</b><p>Ads Watched</p></div>
 <div class="stat"><b id="refs">0</b><p>Referrals</p></div>
-<div class="stat"><b id="total"> $0.00</b><p>Total Earned</p></div>
+<div class="stat"><b id="total">$0.00</b><p>Total Earned</p></div>
 </div>
 
 <div class="card">
@@ -68,7 +68,7 @@ input{width:100%;padding:12px;border-radius:10px;border:none;margin-bottom:10px;
 </div>
 
 <div class="card">
-<h3>💸 Withdraw</h3><p>Minimum withdrawal: $10.00</p>
+<h3>💸 Withdraw</h3><p>Minimum withdrawal: $80.00 - No Maximum Limit</p>
 <input id="pay" placeholder="Enter your UPI / PayPal / Bank details">
 <button class="btn purple" onclick="withdraw()">Request Withdrawal</button>
 </div>
@@ -105,7 +105,7 @@ bal+=0.20; ads++; addHist('Watched Ad','+$0.20'); save(); alert('Thanks for watc
 }
 function copyRef(){let i=document.getElementById('refLink'); i.select(); document.execCommand('copy'); alert('Referral link copied!');}
 function withdraw(){
-if(bal<10){alert('Minimum withdrawal is $10.00. Your balance: $'+bal.toFixed(2)); return;}
+if(bal<80){alert('Minimum withdrawal is $80.00. Your balance: $'+bal.toFixed(2)); return;}
 let p=document.getElementById('pay').value; if(!p){alert('Please enter payment details'); return;}
 alert('Withdrawal request of $'+bal.toFixed(2)+' sent! We will pay within 24 hours.'); bal=0; save();
 }
