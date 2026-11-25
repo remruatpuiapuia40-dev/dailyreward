@@ -1,269 +1,100 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DailyReward</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DailyReward - Earn Daily</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-body{background:#0f0f1a;color:white;padding:16px;padding-bottom:40px}
-.header{text-align:center;padding:20px 0 10px}
-.header h1{font-size:32px}.header h1 span{color:#FFD700}
-.header p{color:#aaa;font-size:14px;margin-top:4px}
-.balance{background:linear-gradient(135deg,#6C5CE7,#a29bfe);border-radius:20px;padding:22px;text-align:center;margin:16px 0;box-shadow:0 10px 30px rgba(108,92,231,.4)}
-.balance small{opacity:.8;font-size:13px;letter-spacing:1px}
-.balance h2{font-size:44px;margin:6px 0}
-.stats{display:flex;gap:10px;margin-bottom:16px}
-.stat{flex:1;background:#1e1e2e;border-radius:14px;padding:12px;text-align:center}
-.stat b{font-size:18px;color:#FFD700;display:block}.stat span{font-size:11px;color:#aaa}
-.card{background:#1e1e2e;border-radius:18px;padding:18px;margin-bottom:14px}
-.card h3{font-size:17px;margin-bottom:4px}.card p{font-size:13px;color:#aaa;margin-bottom:14px}
-.btn{width:100%;padding:15px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer}
-.btn-gold{background:#FFD700;color:#000}.btn-purple{background:#6C5CE7;color:white}
-.btn:disabled{background:#333;color:#888;cursor:not-allowed}
-.progress{height:8px;background:#333;border-radius:10px;overflow:hidden;margin:12px 0}
-.progress div{height:100%;background:#FFD700;width:0%;transition:width 1s linear}
-.small{font-size:12px;color:#888;text-align:center;margin-top:10px;line-height:1.5}
-.history{background:#1e1e2e;border-radius:18px;padding:16px}
-.hist-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2a2a3a;font-size:14px}
-.plus{color:#00e676;font-weight:700}
-input{width:100%;padding:13px;border-radius:10px;border:none;background:#2a2a3a;color:white;margin-bottom:10px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0f172a;color:white;padding:16px;padding-bottom:90px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:22px} .logo span{color:#facc15}
+.badge{background:#facc15;color:black;padding:6px 12px;border-radius:20px;font-weight:700;font-size:13px}
+.card{background:#1e293b;border-radius:16px;padding:16px;margin-top:16px}
+.balance{font-size:36px;font-weight:900} .sub{color:#94a3b8;font-size:13px;margin-top:4px}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-weight:800;font-size:15px;margin-top:10px;cursor:pointer}
+.yellow{background:#facc15;color:black} .green{background:#22c55e;color:white} .dark{background:#334155;color:white}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.small{background:#1e293b;border-radius:14px;padding:14px;text-align:center}
+.small b{font-size:18px} .small p{color:#94a3b8;font-size:12px;margin-top:4px}
+h3{margin:16px 0 8px} input,select{width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;background:#0f172a;color:white;outline:1px solid #334155}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:#1e293b;display:flex;padding:10px}
+.tab{flex:1;text-align:center;font-size:12px;cursor:pointer;padding:8px;border-radius:10px}
+.tab.active{background:#facc15;color:black;font-weight:800}
+.page{display:none} .page.active{display:block}
+.success{color:#22c55e;font-weight:700;font-size:13px;margin-top:8px}
+.note{background:#fef08a;color:black;padding:10px;border-radius:10px;font-size:13px;margin-top:10px}
 </style>
 </head>
 <body>
-<div class="header"><h1>🎁 Daily<span>Reward</span></h1><p>Welcome! Earn rewards every day.</p></div>
-<div class="balance"><small>MY BALANCE</small><h2 id="bal">$0.00</h2><p id="userName">Hi 👋</p></div>
-<div class="stats">
-<div class="stat"><b id="streak">0</b><span>Day Streak 🔥</span></div>
-<div class="stat"><b id="todayWatch">0/5</b><span>Watched Today</span></div>
-<div class="stat"><b id="totalEarned">$0.00</b><span>Total Earned</span></div>
+
+<div class="top"><div class="logo">Daily<span>Reward</span></div><div class="badge" id="levelBadge">Level 1</div></div>
+
+<!-- HOME -->
+<div id="home" class="page active">
+  <div class="card"><div class="sub">Total Balance</div><div class="balance">$<span id="bal">0.00</span></div><div class="sub">Today: $<span id="today">0.00</span> • Referrals: <span id="refCount">0</span></div>
+  <button class="btn yellow" onclick="checkin()">📅 Daily Check-in • Earn $0.50</button>
+  <div id="checkinMsg"></div></div>
+
+  <h3>💰 Earn</h3>
+  <div class="grid">
+    <div class="small" onclick="watchAd()"><div style="font-size:28px">▶️</div><b>Watch & Earn</b><p>$0.10 / Ad • Max 20/day</p><p id="adLeft">20 left</p></div>
+    <div class="small" onclick="showPage('referral')"><div style="font-size:28px">👥</div><b>Referral</b><p>You + Friend = $2 Each</p></div>
+  </div>
+  <div class="card"><b>🎯 Daily Task</b><p class="sub">Watch 5 Ads = Bonus $0.20</p><button class="btn green" onclick="claimTask()">Claim Bonus</button><div id="taskMsg"></div></div>
+</div>
+
+<!-- REFERRAL -->
+<div id="referral" class="page">
+  <div class="card"><h2>👥 Referral - Pahnih ve ve $2</h2><p class="sub">I link hmangin i thian a lo lut a, a Verify a tih zawh chuan nangmah leh i thian pahnih ve ve in <b>$2.00</b> in dawng ang.</p>
+  <div class="note">🔗 Your Link:<br><b id="refLink">https://t.me/DailyEarnRewards2026Bot?start=USER123</b></div>
+  <button class="btn yellow" onclick="copyLink()">📋 Copy Referral Link</button><div id="copyMsg"></div>
+  <p style="margin-top:12px">Total Referrals: <b id="refCount2">0</b> • Earned: $<span id="refEarn">0.00</span></p></div>
+  <div class="card"><b>How it works?</b><p class="sub">1. Link share rawh<br>2. I thian in Verify (Phone+Email) ti rawh se<br>3. Pahnih ve ve $2 lo lut ang</p></div>
+</div>
+
+<!-- WITHDRAW -->
+<div id="withdraw" class="page">
+  <div class="card"><h2>💸 Withdraw</h2><p class="sub">Balance: $<span id="bal2">0.00</span></p><div class="note">⚠️ Minimum Withdraw = <b>$80</b>. $80 tlin hma chu Withdraw a theih loh.</div>
+  <label>Amount ($)</label><input id="wdAmt" type="number" placeholder="Min $80">
+  <label>Method</label><select id="wdMethod"><option>UPI</option><option>Bank Transfer</option><option>PayPal</option></select>
+  <label>UPI ID / Account</label><input id="wdDetail" placeholder="e.g. name@okhdfc / Acc No">
+  <button class="btn green" onclick="withdraw()">Request Withdraw</button><div id="wdMsg"></div></div>
 </div>
 
 <!-- VERIFY -->
-<div class="card" style="border:1px solid #00e676">
-<h3>🔐 Verify Account</h3><p>Referral $2 + Withdraw theih nan Phone leh Email verify ve ve a ngai.</p>
-<p style="font-weight:700;color:white">1. Phone Sign-in: <span id="phoneStatus">❌ Not Verified</span></p>
-<input id="phoneInput" type="tel" placeholder="Phone No - 9862xxxxxx">
-<button class="btn" style="background:#222;color:white" onclick="sendPhoneOTP()">📱 Phone ah OTP Thawn</button>
-<div id="phoneOTPBox" style="display:none;margin-top:10px">
-<input id="phoneOTP" placeholder="OTP 6 digit dah rawh">
-<button class="btn btn-gold" onclick="checkPhoneOTP()">✅ Phone Sign-in</button>
-<p class="small">Demo OTP: <b style="color:#FFD700">123456</b></p>
-</div>
-<p style="font-weight:700;color:white;margin-top:16px">2. Email Verify: <span id="emailStatus">❌ Not Verified</span></p>
-<input id="emailInput" type="email" placeholder="I Email - abc@gmail.com">
-<button class="btn" style="background:#222;color:white" onclick="sendEmailLink()">📧 Email ah Verify Link Thawn</button>
-<div id="emailLinkBox" style="display:none;margin-top:10px;background:#0f0f1a;padding:12px;border-radius:10px;text-align:center">
-<p style="font-size:13px">📧 I Email en rawh! Verify Link kan thawn tawh e.</p>
-<button class="btn btn-gold" style="margin-top:10px" onclick="checkEmailLink()">🔗 [Demo] Email Link ka hmet tawh</button>
-</div>
-<p class="small" id="verifyMsg" style="color:#FFD700;margin-top:12px"></p>
+<div id="verify" class="page">
+  <div class="card"><h2>✅ Verify Account</h2><p class="sub">Verify tih loh chuan Referral Bonus $2 a lut lo ang.</p>
+  <label>Phone Number</label><input id="phone" placeholder="+91 98765 43210"><button class="btn dark" onclick="verifyPhone()">Verify Phone (OTP Demo)</button><div id="phoneMsg"></div>
+  <label style="margin-top:14px;display:block">Email</label><input id="email" placeholder="you@gmail.com"><button class="btn dark" onclick="verifyEmail()">Verify Email</button><div id="emailMsg"></div>
+  <p style="margin-top:12px">Status: <b id="verifyStatus">❌ Not Verified</b></p></div>
 </div>
 
-<!-- WATCH -->
-<div class="card" style="border:1px solid #FFD700">
-<h3>📺 Watch & Earn</h3><p>Video 30 sec en la, <b style="color:#FFD700">$0.10</b> hlawh rawh. Nitin vawi 5.</p>
-<div style="background:#000;border-radius:14px;height:180px;display:flex;align-items:center;justify-content:center;text-align:center">
-<div id="videoPlaceholder"><div style="font-size:50px">▶️</div><p style="font-size:13px;color:#aaa;margin-top:8px">Watch Video hmet la, Ad a lo lang ang</p></div>
-<div id="videoPlaying" style="display:none;width:100%"><div style="font-size:40px">📢</div><p style="font-weight:700">Sponsor Ad Playing...</p><div style="background:#222;height:6px;border-radius:10px;margin:14px 20px;overflow:hidden"><div id="watchBar" style="height:100%;background:#FFD700;width:0%"></div></div><div id="watchTimer" style="font-size:32px;font-weight:800;color:#FFD700">30s</div></div>
+<div class="tabbar">
+  <div class="tab active" onclick="showPage('home',this)">🏠<br>Home</div>
+  <div class="tab" onclick="showPage('referral',this)">👥<br>Referral</div>
+  <div class="tab" onclick="showPage('withdraw',this)">💸<br>Withdraw</div>
+  <div class="tab" onclick="showPage('verify',this)">✅<br>Verify</div>
 </div>
-<button class="btn btn-gold" id="watchBtn" onclick="startWatch()" style="margin-top:14px">▶ Watch Video - Earn $0.10</button>
-<p class="small" id="watchMsg"></p>
-</div>
-
-<!-- CHECK-IN -->
-<div class="card">
-<h3>📅 Daily Check-in</h3><p>Check-in every day and earn <b>$0.05</b> + streak bonus.</p>
-<button class="btn btn-purple" id="checkBtn" onclick="doCheckin()">✅ Check-in Today - Earn $0.05</button>
-<p class="small" id="checkMsg"></p>
-</div>
-
-<!-- HISTORY -->
-<div class="history"><h3>🕘 Recent History</h3><div id="history">No earnings yet.</div></div>
-
-<!-- WITHDRAW $80 -->
-<div class="card" style="margin-top:14px">
-<h3>💸 Withdraw</h3><p>Minimum withdraw: <b style="color:#FFD700">$80</b>. I balance: <b id="withdrawBal">$0.00</b></p>
-<div class="progress"><div id="withdrawProg" style="background:#00e676"></div></div>
-<p class="small" id="withdrawMsg"></p>
-<button class="btn btn-gold" id="withdrawBtn" onclick="doWithdraw()" disabled>🔒 $80 thlen hma chu Withdraw theih loh</button>
-<div id="withdrawForm" style="display:none;margin-top:12px">
-<input id="upiId" placeholder="I UPI ID / PayPal Email">
-<button class="btn" style="background:#00e676;color:black" onclick="confirmWithdraw()">Withdraw Request Thawn</button>
-</div>
-</div>
-
-<!-- REFERRAL - PAHNIH VE VE $2 -->
-<div class="card" style="border:1px solid #FFD700">
-<h3>👥 Refer & Earn - Pahnih ve ve $2!</h3><p>Thian 1 i sawm a, a Verify + Active a tih zawh ah: <b style="color:#FFD700">NANG $2 + THIAN $2</b> - pahnih ve ve in $2 an dawng ang.</p>
-<p style="font-size:13px;color:white;margin-top:10px">I Referral Code:</p>
-<div style="background:#0f0f1a;border-radius:10px;padding:12px;margin:6px 0;word-break:break-all;font-size:13px;font-weight:700;color:#FFD700" id="myCode">Loading...</div>
-<div style="background:#0f0f1a;border-radius:10px;padding:12px;margin:6px 0;word-break:break-all;font-size:12px" id="refLink">Loading...</div>
-<button class="btn" style="background:#FFD700;color:black" onclick="copyRef()">📋 Referral Link Copy</button>
-
-<p style="font-size:13px;color:white;margin-top:16px">Thianin a sawm che em? A Code dah rawh:</p>
-<input id="joinerCodeInput" placeholder="Thian Referral Code - entirnan: REF1234">
-<button class="btn" style="background:#222;color:white" onclick="applyReferralCode()">✅ Code Apply - Join</button>
-<p class="small" id="joinerCodeMsg"></p>
-
-<div class="stats" style="margin-top:12px"><div class="stat"><b id="refCount">0</b><span>Friends Joined</span></div><div class="stat"><b id="refEarned">$0.00</b><span>Referral Earned</span></div></div>
-<p class="small" id="refPending">Pending: 0 | Verified & Paid: 0</p>
-<p class="small" id="welcomeStatus"></p>
-<button class="btn" style="background:#222;color:#aaa;margin-top:6px;font-size:13px" onclick="testReferral()">[Test] Thian 1 in Verify + Active a ti ta - $2 pahnih ve ve dawng rawh</button>
-<p class="small">I link hi WhatsApp / Telegram ah share rawh!</p>
-</div>
-
-<p class="small">Balance is saved on your device. Even if you close the app, it stays.</p>
 
 <script>
-let tg = window.Telegram?.WebApp; if(tg){ tg.ready(); tg.expand(); }
-let data = JSON.parse(localStorage.getItem('dr_data') || '{}');
-if(data.balance===undefined) data={balance:0,total:0,streak:0,lastCheckin:'',watchDate:'',watchCount:0,history:[],myCode:'',usedReferral:'',welcomeClaimed:false};
-let verify = JSON.parse(localStorage.getItem('dr_verify') || '{"email":false,"phone":false}');
-let refData = JSON.parse(localStorage.getItem('dr_ref') || '{"count":0,"earned":0,"pending":0}');
-
-function save(){ localStorage.setItem('dr_data', JSON.stringify(data)); localStorage.setItem('dr_ref', JSON.stringify(refData)); render(); updateWithdraw(); setupReferral(); }
-function render(){
-  document.getElementById('bal').innerText='$'+data.balance.toFixed(2);
-  document.getElementById('totalEarned').innerText='$'+data.total.toFixed(2);
-  document.getElementById('streak').innerText=data.streak;
-  let today=new Date().toDateString();
-  if(data.watchDate!==today){ data.watchCount=0; data.watchDate=today; }
-  document.getElementById('todayWatch').innerText=data.watchCount+'/5';
-  let name=tg?.initDataUnsafe?.user?.first_name||'Guest';
-  document.getElementById('userName').innerText='Hi, '+name+' 👋';
-  let todayCheck=data.lastCheckin===today;
-  let cb=document.getElementById('checkBtn'); cb.disabled=todayCheck;
-  cb.innerText=todayCheck?'✅ Already Checked-in Today':'✅ Check-in Today - Earn $0.05';
-  document.getElementById('checkMsg').innerText=todayCheck?'Come back tomorrow!':'';
-  let wb=document.getElementById('watchBtn');
-  if(data.watchCount>=5){ wb.disabled=true; wb.innerText='Limit Reached - Come Back Tomorrow'; }
-  else { wb.disabled=false; wb.innerText='▶ Watch Video - Earn $0.10'; }
-  let h=document.getElementById('history');
-  h.innerHTML=!data.history.length?'No earnings yet.':data.history.slice(-5).reverse().map(x=>`<div class="hist-item"><span>${x.label}</span><b class="plus">+$${x.amount.toFixed(2)}</b></div>`).join('');
-  // Welcome bonus status
-  if(data.usedReferral){
-    if(data.welcomeClaimed) document.getElementById('welcomeStatus').innerHTML='<span style="color:#00e676">✅ Welcome $2 i dawng tawh - Code: '+data.usedReferral+'</span>';
-    else document.getElementById('welcomeStatus').innerHTML='<span style="color:#FFD700">⏳ Code '+data.usedReferral+' i hmang. Verify + Active i tih zawh ah $2 i dawng ang.</span>';
-  }
-}
-function addEarn(amount,label){ data.balance+=amount; data.total+=amount; data.history.push({label,amount}); save(); }
-function doCheckin(){
-  let today=new Date().toDateString(); if(data.lastCheckin===today) return;
-  let yesterday=new Date(Date.now()-86400000).toDateString();
-  if(data.lastCheckin===yesterday) data.streak+=1; else data.streak=1;
-  data.lastCheckin=today; addEarn(0.05,'Daily Check-in'); alert('🎉 Check-in Success! $0.05 i hlawh ta!');
-}
-let watching=false;
-function startWatch(){
-  if(watching) return; if(data.watchCount>=5) return;
-  watching=true;
-  document.getElementById('videoPlaceholder').style.display='none';
-  document.getElementById('videoPlaying').style.display='block';
-  let btn=document.getElementById('watchBtn'); btn.disabled=true; btn.innerText='⏳ Watching... 30s nghak rawh';
-  let left=30; document.getElementById('watchTimer').innerText=left+'s';
-  let iv=setInterval(()=>{
-    left--; document.getElementById('watchTimer').innerText=left+'s';
-    document.getElementById('watchBar').style.width=((30-left)/30*100)+'%';
-    if(left<=0){ clearInterval(iv); watching=false; data.watchCount++; addEarn(0.10,'Watch & Earn');
-      document.getElementById('videoPlaying').style.display='none';
-      document.getElementById('videoPlaceholder').style.display='block';
-      document.getElementById('videoPlaceholder').innerHTML='<div style="font-size:40px">✅</div><p style="color:#00e676;font-weight:700">$0.10 i hlawh ta!</p>';
-      setTimeout(()=>{ document.getElementById('videoPlaceholder').innerHTML='<div style="font-size:50px">▶️</div><p style="font-size:13px;color:#aaa">Watch Video hmet la, Ad a lo lang ang</p>'; },3000);
-      alert('🎉 $0.10 i hlawh ta! Balance: $'+data.balance.toFixed(2));
-    }
-  },1000);
-}
-// VERIFY
-function updateVerifyUI(){
-  document.getElementById('phoneStatus').innerText = verify.phone ? '✅ Verified' : '❌ Not Verified';
-  document.getElementById('emailStatus').innerText = verify.email ? '✅ Verified' : '❌ Not Verified';
-  if(verify.email && verify.phone){
-    document.getElementById('verifyMsg').innerText = '🎉 Full Verified! Referral $2 i dawng thei tawh e.';
-    checkWelcomeBonus(); // Verify zawh ah Joiner $2 pek na
-  } else document.getElementById('verifyMsg').innerText = 'Phone + Email verify ve ve a ngai. Verify lo chuan Referral $2 a lut lo.';
-}
-function sendPhoneOTP(){
-  let p=document.getElementById('phoneInput').value.trim();
-  if(!p || p.length<10){ alert('Phone No dik tak dah rawh!'); return; }
-  document.getElementById('phoneOTPBox').style.display='block';
-  alert('OTP thawn a ni! I Phone en rawh. Demo: 123456');
-}
-function checkPhoneOTP(){
-  if(document.getElementById('phoneOTP').value.trim()==='123456'){
-    verify.phone=true; localStorage.setItem('dr_verify',JSON.stringify(verify)); updateVerifyUI(); alert('✅ Phone Sign-in hlawhtling!');
-  } else alert('OTP a dik lo!');
-}
-function sendEmailLink(){
-  let e=document.getElementById('emailInput').value.trim();
-  if(!e || !e.includes('@')){ alert('Email dik tak dah rawh!'); return; }
-  document.getElementById('emailLinkBox').style.display='block';
-  alert('Verify Link thawn a ni! I Email - '+e+' - en rawh.');
-}
-function checkEmailLink(){
-  verify.email=true; localStorage.setItem('dr_verify',JSON.stringify(verify)); updateVerifyUI(); alert('✅ Email Verified!');
-}
-// WITHDRAW - $80
-function updateWithdraw(){
-  let bal=data.balance; document.getElementById('withdrawBal').innerText='$'+bal.toFixed(2);
-  document.getElementById('withdrawProg').style.width=Math.min(bal/80*100,100)+'%';
-  let btn=document.getElementById('withdrawBtn');
-  if(bal>=80){ btn.disabled=false; btn.innerText='💸 Withdraw $'+bal.toFixed(2)+' - Hmet rawh'; document.getElementById('withdrawMsg').innerText='🎉 $80 i tling ta! Withdraw thei tawh e.'; }
-  else { btn.disabled=true; btn.innerText='🔒 $80 thlen hma chu Withdraw theih loh'; document.getElementById('withdrawMsg').innerText='$80 thlen nan $'+(80-bal).toFixed(2)+' i la mamawh. Referral $2 i dawng tawh a, mahse Withdraw chu $80 ah chauh a in hawng.'; }
-}
-function doWithdraw(){ if(data.balance<80) return; document.getElementById('withdrawForm').style.display='block'; }
-function confirmWithdraw(){
-  let upi=document.getElementById('upiId').value.trim(); if(!upi||upi.length<5){ alert('UPI / PayPal dik tak dah rawh!'); return; }
-  let amt=data.balance; alert('✅ Withdraw Request hlawhtling!\nAmount: $'+amt.toFixed(2)+'\nTo: '+upi+'\n\n24 hours chhungin i dawng ang.');
-  data.balance=0; save(); document.getElementById('withdrawForm').style.display='none';
-}
-// REFERRAL - PAHNIH VE VE $2
-function getMyCode(){
-  if(!data.myCode){
-    let myId=tg?.initDataUnsafe?.user?.id||Math.floor(Math.random()*99999);
-    data.myCode='REF'+myId; localStorage.setItem('dr_data', JSON.stringify(data));
-  }
-  return data.myCode;
-}
-function setupReferral(){
-  let code=getMyCode();
-  document.getElementById('myCode').innerText=code;
-  document.getElementById('refLink').innerText='https://t.me/DailyReward2026Bot/DailyReward?start='+code;
-  document.getElementById('refCount').innerText=refData.count;
-  document.getElementById('refEarned').innerText='$'+refData.earned.toFixed(2);
-  document.getElementById('refPending').innerText='Pending: '+refData.pending+' | Verified & Paid: '+refData.count;
-}
-function copyRef(){ navigator.clipboard.writeText(document.getElementById('refLink').innerText).then(()=>{ alert('✅ Copy hlawhtling! Thiante hnenah thawn rawh. Pahnih ve ve $2!'); }); }
-function applyReferralCode(){
-  let c=document.getElementById('joinerCodeInput').value.trim().toUpperCase();
-  if(!c){ alert('Thian Code dah rawh!'); return; }
-  if(c===getMyCode()){ alert('Mahni Code hman theih loh!'); return; }
-  if(data.usedReferral){ alert('Code i hmang tawh - '+data.usedReferral); return; }
-  data.usedReferral=c; save();
-  document.getElementById('joinerCodeMsg').innerText='✅ Code '+c+' i hmang ta. Verify + Active i tih zawh ah NANG $2 + I THIAN $2 an dawng ang.';
-  alert('✅ Code Apply hlawhtling! Verify i tih zawh ah $2 i dawng ang.');
-}
-// JOINER $2 - Welcome Bonus - Verify zawh ah chauh
-function checkWelcomeBonus(){
-  if(data.usedReferral && !data.welcomeClaimed && verify.email && verify.phone){
-    data.welcomeClaimed=true;
-    data.balance+=2; data.total+=2;
-    data.history.push({label:'Welcome Bonus - Join + Verify ($2)',amount:2});
-    save();
-    alert('🎉 Verify hlawhtling! NANGMAH hnenah $2 Welcome Bonus a lut ta!\nI sawmtu hnenah pawh $2 a lut ve bawk ang.\nBalance: $'+data.balance.toFixed(2));
-  }
-}
-// INVITER $2 - Thianin Verify + Active a tih zawh ah
-function testReferral(){
-  // Thian 1 in Verify + Active a ti ta tih entirna
-  refData.count+=1; refData.earned+=2; refData.pending=Math.max(0,refData.pending);
-  data.balance+=2; data.total+=2; data.history.push({label:'Referral Bonus - I thian a Verify ta ($2)',amount:2});
-  save();
-  alert('🎉 I thian 1 in Verify + Active a ti ta!\n\n✅ NANG (Sawmtu): $2 i dawng ta!\n✅ THIAN (Join tu): $2 a dawng ve bawk ang!\n\nBalance: $'+data.balance.toFixed(2)+'\nMahse Withdraw chu $80 ah chauh a in hawng.');
-}
-render(); updateWithdraw(); updateVerifyUI(); setupReferral();
+let bal=parseFloat(localStorage.getItem('bal')||0);
+let ads=parseInt(localStorage.getItem('ads')||0);
+let refs=parseInt(localStorage.getItem('refs')||0);
+let phoneV=localStorage.getItem('phoneV')=='1';
+let emailV=localStorage.getItem('emailV')=='1';
+function save(){localStorage.setItem('bal',bal);localStorage.setItem('ads',ads);localStorage.setItem('refs',refs);update();}
+function update(){document.getElementById('bal').innerText=bal.toFixed(2);document.getElementById('bal2').innerText=bal.toFixed(2);document.getElementById('adLeft').innerText=(20-ads)+' left';document.getElementById('refCount').innerText=refs;document.getElementById('refCount2').innerText=refs;document.getElementById('refEarn').innerText=(refs*2).toFixed(2);document.getElementById('verifyStatus').innerText=(phoneV&&emailV)?'✅ Verified - $2 Bonus Ready':'❌ Not Verified';if(window.Telegram&&Telegram.WebApp)Telegram.WebApp.ready();}
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');if(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}}
+function checkin(){if(localStorage.getItem('lastCheck')==new Date().toDateString()){document.getElementById('checkinMsg').innerHTML='<div class=success>Vawiin ah i check-in tawh!</div>';return;}bal+=0.5;localStorage.setItem('lastCheck',new Date().toDateString());save();document.getElementById('checkinMsg').innerHTML='<div class=success>✅ +$0.50 Check-in Success!</div>';}
+function watchAd(){if(ads>=20){alert('Vawiin quota a full tawh');return;}ads++;bal+=0.10;save();alert('✅ +$0.10 Ad Reward!');}
+function claimTask(){if(ads>=5){bal+=0.20;save();document.getElementById('taskMsg').innerHTML='<div class=success>✅ +$0.20 Bonus!</div>';}else{document.getElementById('taskMsg').innerHTML='Ad 5 en phawt rawh. ('+ads+'/5)';}}
+function copyLink(){let l=document.getElementById('refLink').innerText;navigator.clipboard.writeText(l);document.getElementById('copyMsg').innerHTML='<div class=success>✅ Link Copied!</div>';}
+function verifyPhone(){if(document.getElementById('phone').value.length<8){alert('Phone number dik lo');return;}phoneV=true;localStorage.setItem('phoneV','1');save();document.getElementById('phoneMsg').innerHTML='<div class=success>✅ Phone Verified!</div>';}
+function verifyEmail(){if(!document.getElementById('email').value.includes('@')){alert('Email dik lo');return;}emailV=true;localStorage.setItem('emailV','1');save();document.getElementById('emailMsg').innerHTML='<div class=success>✅ Email Verified!</div>';}
+function withdraw(){let a=parseFloat(document.getElementById('wdAmt').value);if(a<80){document.getElementById('wdMsg').innerHTML='❌ Minimum $80 a ngai. I balance: $'+bal.toFixed(2);return;}if(a>bal){document.getElementById('wdMsg').innerHTML='❌ Balance a tawk lo';return;}if(!phoneV||!emailV){document.getElementById('wdMsg').innerHTML='❌ Verify phawt rawh (Phone+Email)';return;}bal-=a;save();document.getElementById('wdMsg').innerHTML='<div class=success>✅ Withdraw Request $'+a+' - 24-48h ah a lut ang!</div>';}
+update();
 </script>
 </body>
 </html>
