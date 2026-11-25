@@ -3,98 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DailyReward - Earn Daily</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<title>DailyReward</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#0f172a;color:white;padding:16px;padding-bottom:90px}
-.top{display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:900;font-size:22px} .logo span{color:#facc15}
-.badge{background:#facc15;color:black;padding:6px 12px;border-radius:20px;font-weight:700;font-size:13px}
-.card{background:#1e293b;border-radius:16px;padding:16px;margin-top:16px}
-.balance{font-size:36px;font-weight:900} .sub{color:#94a3b8;font-size:13px;margin-top:4px}
-.btn{width:100%;padding:14px;border:none;border-radius:12px;font-weight:800;font-size:15px;margin-top:10px;cursor:pointer}
-.yellow{background:#facc15;color:black} .green{background:#22c55e;color:white} .dark{background:#334155;color:white}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.small{background:#1e293b;border-radius:14px;padding:14px;text-align:center}
-.small b{font-size:18px} .small p{color:#94a3b8;font-size:12px;margin-top:4px}
-h3{margin:16px 0 8px} input,select{width:100%;padding:12px;border-radius:10px;border:none;margin-top:8px;background:#0f172a;color:white;outline:1px solid #334155}
-.tabbar{position:fixed;bottom:0;left:0;right:0;background:#1e293b;display:flex;padding:10px}
-.tab{flex:1;text-align:center;font-size:12px;cursor:pointer;padding:8px;border-radius:10px}
-.tab.active{background:#facc15;color:black;font-weight:800}
-.page{display:none} .page.active{display:block}
-.success{color:#22c55e;font-weight:700;font-size:13px;margin-top:8px}
-.note{background:#fef08a;color:black;padding:10px;border-radius:10px;font-size:13px;margin-top:10px}
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#0f1a2e;color:white;padding:0;padding-bottom:90px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:18px 16px 8px}
+.logo{font-size:30px;font-weight:900}
+.logo span{color:#facc15}
+.level{background:#facc15;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;font-size:16px}
+.balanceCard{background:#1c2a44;margin:12px 16px;border-radius:20px;padding:20px}
+.balanceCard p{margin:0;color:#94a3b8}
+.balanceCard h1{font-size:48px;margin:8px 0}
+.balanceCard .sub{color:#94a3b8}
+.checkBtn{width:100%;background:#facc15;color:#000;border:none;padding:15px;border-radius:12px;font-size:18px;font-weight:bold;margin-top:16px;cursor:pointer}
+.checkBtn:disabled{background:#475569;color:#cbd5e1}
+h2{padding:0 16px;font-size:24px;margin:20px 0 12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
+.box{background:#1c2a44;border-radius:16px;padding:18px 10px;text-align:center;cursor:pointer}
+.box .icon{font-size:38px}
+.box h3{margin:8px 0 4px;font-size:20px}
+.box p{margin:0;color:#94a3b8;font-size:13px;line-height:1.4}
+.task{background:#1c2a44;margin:16px;border-radius:16px;padding:18px}
+.task h3{margin:0;font-size:20px}
+.task p{color:#94a3b8;margin:6px 0 14px}
+.claim{width:100%;background:#22c55e;color:white;border:none;padding:14px;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer}
+.claim:disabled{background:#475569;color:#94a3b8}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#16233a;display:flex;padding:10px 8px;justify-content:space-around}
+.nav div{text-align:center;font-size:14px;color:#94a3b8;padding:8px 12px;border-radius:12px;cursor:pointer}
+.nav .active{background:#facc15;color:#000;font-weight:bold}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99;align-items:center;justify-content:center;padding:20px}
+.modal.show{display:flex}
+.mbox{background:#1c2a44;border-radius:20px;padding:24px;width:100%;max-width:400px;text-align:center}
+.timer{font-size:64px;font-weight:900;margin:10px 0}
+.prog{height:10px;background:#334155;border-radius:5px;overflow:hidden;margin:12px 0}
+.prog div{height:100%;background:#22c55e;width:0%}
+.adbox{background:#0f1a2e;height:150px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:60px;margin:12px 0}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer}
 </style>
 </head>
 <body>
-
-<div class="top"><div class="logo">Daily<span>Reward</span></div><div class="badge" id="levelBadge">Level 1</div></div>
-
-<!-- HOME -->
-<div id="home" class="page active">
-  <div class="card"><div class="sub">Total Balance</div><div class="balance">$<span id="bal">0.00</span></div><div class="sub">Today: $<span id="today">0.00</span> • Referrals: <span id="refCount">0</span></div>
-  <button class="btn yellow" onclick="checkin()">📅 Daily Check-in • Earn $0.50</button>
-  <div id="checkinMsg"></div></div>
-
-  <h3>💰 Earn</h3>
-  <div class="grid">
-    <div class="small" onclick="watchAd()"><div style="font-size:28px">▶️</div><b>Watch & Earn</b><p>$0.10 / Ad • Max 20/day</p><p id="adLeft">20 left</p></div>
-    <div class="small" onclick="showPage('referral')"><div style="font-size:28px">👥</div><b>Referral</b><p>You + Friend = $2 Each</p></div>
-  </div>
-  <div class="card"><b>🎯 Daily Task</b><p class="sub">Watch 5 Ads = Bonus $0.20</p><button class="btn green" onclick="claimTask()">Claim Bonus</button><div id="taskMsg"></div></div>
+<div class="top"><div class="logo">Daily<span>Reward</span></div><div class="level">Level 1</div></div>
+<div class="balanceCard"><p>Total Balance</p><h1 id="bal">$0.00</h1><div class="sub" id="todayLine">Today: $0.00 • Referrals: 0</div><button class="checkBtn" id="checkBtn" onclick="checkIn()">📅 Daily Check-in • Earn $0.50</button></div>
+<h2>💰 Earn</h2>
+<div class="grid">
+<div class="box" onclick="startWatch()"><div class="icon">▶️</div><h3>Watch & Earn</h3><p>$0.10 / Ad • Max 20/day<br><span id="leftTxt">20 left</span></p></div>
+<div class="box" onclick="showRef()"><div class="icon">👥</div><h3>Referral</h3><p>You + Friend = $2 Each</p></div>
 </div>
-
-<!-- REFERRAL -->
-<div id="referral" class="page">
-  <div class="card"><h2>👥 Referral - Pahnih ve ve $2</h2><p class="sub">I link hmangin i thian a lo lut a, a Verify a tih zawh chuan nangmah leh i thian pahnih ve ve in <b>$2.00</b> in dawng ang.</p>
-  <div class="note">🔗 Your Link:<br><b id="refLink">https://t.me/DailyEarnRewards2026Bot?start=USER123</b></div>
-  <button class="btn yellow" onclick="copyLink()">📋 Copy Referral Link</button><div id="copyMsg"></div>
-  <p style="margin-top:12px">Total Referrals: <b id="refCount2">0</b> • Earned: $<span id="refEarn">0.00</span></p></div>
-  <div class="card"><b>How it works?</b><p class="sub">1. Link share rawh<br>2. I thian in Verify (Phone+Email) ti rawh se<br>3. Pahnih ve ve $2 lo lut ang</p></div>
-</div>
-
-<!-- WITHDRAW -->
-<div id="withdraw" class="page">
-  <div class="card"><h2>💸 Withdraw</h2><p class="sub">Balance: $<span id="bal2">0.00</span></p><div class="note">⚠️ Minimum Withdraw = <b>$80</b>. $80 tlin hma chu Withdraw a theih loh.</div>
-  <label>Amount ($)</label><input id="wdAmt" type="number" placeholder="Min $80">
-  <label>Method</label><select id="wdMethod"><option>UPI</option><option>Bank Transfer</option><option>PayPal</option></select>
-  <label>UPI ID / Account</label><input id="wdDetail" placeholder="e.g. name@okhdfc / Acc No">
-  <button class="btn green" onclick="withdraw()">Request Withdraw</button><div id="wdMsg"></div></div>
-</div>
-
-<!-- VERIFY -->
-<div id="verify" class="page">
-  <div class="card"><h2>✅ Verify Account</h2><p class="sub">Verify tih loh chuan Referral Bonus $2 a lut lo ang.</p>
-  <label>Phone Number</label><input id="phone" placeholder="+91 98765 43210"><button class="btn dark" onclick="verifyPhone()">Verify Phone (OTP Demo)</button><div id="phoneMsg"></div>
-  <label style="margin-top:14px;display:block">Email</label><input id="email" placeholder="you@gmail.com"><button class="btn dark" onclick="verifyEmail()">Verify Email</button><div id="emailMsg"></div>
-  <p style="margin-top:12px">Status: <b id="verifyStatus">❌ Not Verified</b></p></div>
-</div>
-
-<div class="tabbar">
-  <div class="tab active" onclick="showPage('home',this)">🏠<br>Home</div>
-  <div class="tab" onclick="showPage('referral',this)">👥<br>Referral</div>
-  <div class="tab" onclick="showPage('withdraw',this)">💸<br>Withdraw</div>
-  <div class="tab" onclick="showPage('verify',this)">✅<br>Verify</div>
-</div>
-
+<div class="task"><h3>🎯 Daily Task</h3><p>Watch 5 Ads = Bonus $0.20 • <span id="taskTxt">0 / 5</span></p><button class="claim" id="taskBtn" onclick="claimTask()" disabled>Claim Bonus</button></div>
+<div class="nav"><div class="active">🏠<br>Home</div><div onclick="showRef()">👥<br>Referral</div><div onclick="withdraw()">💸<br>Withdraw</div><div>✅<br>Verify</div></div>
+<div class="modal" id="modal"><div class="mbox"><h2>📺 Watching Ad...</h2><div class="adbox">🎬</div><div class="timer" id="timer">15</div><div class="prog"><div id="prog"></div></div><p id="wTxt">Ngaihhruai la, ad a kal mek...</p><button class="btn" id="claimBtn" style="display:none;background:#22c55e;color:white" onclick="claim()">✅ Claim $0.10</button><button class="btn" style="background:#334155;color:white;margin-top:10px" onclick="closeM()">Close</button></div></div>
 <script>
-let bal=parseFloat(localStorage.getItem('bal')||0);
-let ads=parseInt(localStorage.getItem('ads')||0);
-let refs=parseInt(localStorage.getItem('refs')||0);
-let phoneV=localStorage.getItem('phoneV')=='1';
-let emailV=localStorage.getItem('emailV')=='1';
-function save(){localStorage.setItem('bal',bal);localStorage.setItem('ads',ads);localStorage.setItem('refs',refs);update();}
-function update(){document.getElementById('bal').innerText=bal.toFixed(2);document.getElementById('bal2').innerText=bal.toFixed(2);document.getElementById('adLeft').innerText=(20-ads)+' left';document.getElementById('refCount').innerText=refs;document.getElementById('refCount2').innerText=refs;document.getElementById('refEarn').innerText=(refs*2).toFixed(2);document.getElementById('verifyStatus').innerText=(phoneV&&emailV)?'✅ Verified - $2 Bonus Ready':'❌ Not Verified';if(window.Telegram&&Telegram.WebApp)Telegram.WebApp.ready();}
-function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');if(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');}}
-function checkin(){if(localStorage.getItem('lastCheck')==new Date().toDateString()){document.getElementById('checkinMsg').innerHTML='<div class=success>Vawiin ah i check-in tawh!</div>';return;}bal+=0.5;localStorage.setItem('lastCheck',new Date().toDateString());save();document.getElementById('checkinMsg').innerHTML='<div class=success>✅ +$0.50 Check-in Success!</div>';}
-function watchAd(){if(ads>=20){alert('Vawiin quota a full tawh');return;}ads++;bal+=0.10;save();alert('✅ +$0.10 Ad Reward!');}
-function claimTask(){if(ads>=5){bal+=0.20;save();document.getElementById('taskMsg').innerHTML='<div class=success>✅ +$0.20 Bonus!</div>';}else{document.getElementById('taskMsg').innerHTML='Ad 5 en phawt rawh. ('+ads+'/5)';}}
-function copyLink(){let l=document.getElementById('refLink').innerText;navigator.clipboard.writeText(l);document.getElementById('copyMsg').innerHTML='<div class=success>✅ Link Copied!</div>';}
-function verifyPhone(){if(document.getElementById('phone').value.length<8){alert('Phone number dik lo');return;}phoneV=true;localStorage.setItem('phoneV','1');save();document.getElementById('phoneMsg').innerHTML='<div class=success>✅ Phone Verified!</div>';}
-function verifyEmail(){if(!document.getElementById('email').value.includes('@')){alert('Email dik lo');return;}emailV=true;localStorage.setItem('emailV','1');save();document.getElementById('emailMsg').innerHTML='<div class=success>✅ Email Verified!</div>';}
-function withdraw(){let a=parseFloat(document.getElementById('wdAmt').value);if(a<80){document.getElementById('wdMsg').innerHTML='❌ Minimum $80 a ngai. I balance: $'+bal.toFixed(2);return;}if(a>bal){document.getElementById('wdMsg').innerHTML='❌ Balance a tawk lo';return;}if(!phoneV||!emailV){document.getElementById('wdMsg').innerHTML='❌ Verify phawt rawh (Phone+Email)';return;}bal-=a;save();document.getElementById('wdMsg').innerHTML='<div class=success>✅ Withdraw Request $'+a+' - 24-48h ah a lut ang!</div>';}
-update();
+let bal=parseFloat(localStorage.getItem('dr_bal')||'0');
+let today=new Date().toDateString();
+if(localStorage.getItem('dr_day')!==today){localStorage.setItem('dr_day',today);localStorage.setItem('dr_w','0');localStorage.setItem('dr_c','0');localStorage.setItem('dr_today','0');localStorage.setItem('dr_task','0');}
+let w=parseInt(localStorage.getItem('dr_w')||'0');
+let checked=localStorage.getItem('dr_c')==='1';
+let todayEarn=parseFloat(localStorage.getItem('dr_today')||'0');
+let taskDone=localStorage.getItem('dr_task')==='1';
+function save(){localStorage.setItem('dr_bal',bal);localStorage.setItem('dr_w',w);localStorage.setItem('dr_c',checked?'1':'0');localStorage.setItem('dr_today',todayEarn);localStorage.setItem('dr_task',taskDone?'1':'0');upd();}
+function upd(){
+ document.getElementById('bal').innerText='$'+bal.toFixed(2);
+ document.getElementById('todayLine').innerText='Today: $'+todayEarn.toFixed(2)+' • Referrals: 0';
+ document.getElementById('leftTxt').innerText=(20-w)+' left';
+ document.getElementById('taskTxt').innerText=w+' / 5';
+ let cb=document.getElementById('checkBtn'); if(checked){cb.disabled=true;cb.innerText='✅ Vawiin i Check-in tawh';}
+ let tb=document.getElementById('taskBtn'); if(taskDone){tb.disabled=true;tb.innerText='✅ Bonus lak tawh';} else if(w>=5){tb.disabled=false;} else {tb.disabled=true;}
+}
+let iv;
+function startWatch(){
+ if(w>=20){alert('Vawiin atan 20 i en zo tawh!');return;}
+ document.getElementById('modal').classList.add('show');
+ document.getElementById('claimBtn').style.display='none';
+ document.getElementById('wTxt').innerText='Ngaihhruai la, ad a kal mek...';
+ let s=15;document.getElementById('timer').innerText=s;document.getElementById('prog').style.width='0%';
+ clearInterval(iv);
+ iv=setInterval(()=>{s--;document.getElementById('timer').innerText=s;document.getElementById('prog').style.width=((15-s)/15*100)+'%'; if(s<=0){clearInterval(iv);document.getElementById('wTxt').innerText='A zo ta! Claim hmet rawh.';document.getElementById('claimBtn').style.display='block';}},1000);
+}
+function claim(){bal+=0.10;todayEarn+=0.10;w++;save();closeM();alert('🎉 $0.10 i hlawh ta! Balance: $'+bal.toFixed(2));}
+function closeM(){document.getElementById('modal').classList.remove('show');clearInterval(iv);}
+function checkIn(){if(checked)return;bal+=0.50;todayEarn+=0.50;checked=true;save();alert('🎉 Check-in $0.50!');}
+function claimTask(){if(w<5||taskDone)return;bal+=0.20;todayEarn+=0.20;taskDone=true;save();alert('🎉 Task Bonus $0.20!');}
+function showRef(){alert('I Referral Link:\nhttps://t.me/DailyReward2026Bot?start=REF123\n\nI thian in i link hmangin a join chuan nangmah leh amah $2 ve ve in hmu ang!');}
+function withdraw(){if(bal<5){alert('Withdraw nan $5.00 a ngai. Tunah: $'+bal.toFixed(2));return;}alert('Withdraw: $'+bal.toFixed(2)+' - Admin in a lo en ang.');}
+upd();
 </script>
 </body>
 </html>
