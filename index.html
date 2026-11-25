@@ -3,89 +3,113 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DailyReward</title>
+<title>DailyReward - Earn Daily</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-*{box-sizing:border-box;font-family:Arial,sans-serif}
-body{margin:0;background:#0f1a2e;color:white;padding:0;padding-bottom:90px}
-.top{display:flex;justify-content:space-between;align-items:center;padding:18px 16px 8px}
-.logo{font-size:30px;font-weight:900}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#0f172a;color:white;padding:16px;padding-bottom:90px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.logo{font-size:22px;font-weight:900}
 .logo span{color:#facc15}
-.level{background:#facc15;color:#000;padding:8px 16px;border-radius:20px;font-weight:bold;font-size:16px}
-.balanceCard{background:#1c2a44;margin:12px 16px;border-radius:20px;padding:20px}
-.balanceCard p{margin:0;color:#94a3b8}
-.balanceCard h1{font-size:48px;margin:8px 0}
-.balanceCard .sub{color:#94a3b8}
-.checkBtn{width:100%;background:#facc15;color:#000;border:none;padding:15px;border-radius:12px;font-size:18px;font-weight:bold;margin-top:16px;cursor:pointer}
-.checkBtn:disabled{background:#475569;color:#cbd5e1}
-h2{padding:0 16px;font-size:24px;margin:20px 0 12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}
-.box{background:#1c2a44;border-radius:16px;padding:18px 10px;text-align:center;cursor:pointer}
-.box .icon{font-size:38px}
-.box h3{margin:8px 0 4px;font-size:20px}
-.box p{margin:0;color:#94a3b8;font-size:13px;line-height:1.4}
-.task{background:#1c2a44;margin:16px;border-radius:16px;padding:18px}
-.task h3{margin:0;font-size:20px}
-.task p{color:#94a3b8;margin:6px 0 14px}
-.claim{width:100%;background:#22c55e;color:white;border:none;padding:14px;border-radius:12px;font-size:18px;font-weight:bold;cursor:pointer}
-.claim:disabled{background:#475569;color:#94a3b8}
-.nav{position:fixed;bottom:0;left:0;right:0;background:#16233a;display:flex;padding:10px 8px;justify-content:space-around}
-.nav div{text-align:center;font-size:14px;color:#94a3b8;padding:8px 12px;border-radius:12px;cursor:pointer}
-.nav .active{background:#facc15;color:#000;font-weight:bold}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99;align-items:center;justify-content:center;padding:20px}
-.modal.show{display:flex}
-.mbox{background:#1c2a44;border-radius:20px;padding:24px;width:100%;max-width:400px;text-align:center}
-.timer{font-size:64px;font-weight:900;margin:10px 0}
-.prog{height:10px;background:#334155;border-radius:5px;overflow:hidden;margin:12px 0}
-.prog div{height:100%;background:#22c55e;width:0%}
-.adbox{background:#0f1a2e;height:150px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:60px;margin:12px 0}
-.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer}
+.live{background:#dc2626;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.balance{background:linear-gradient(135deg,#facc15,#f97316);color:#111;padding:20px;border-radius:20px;text-align:center;margin-bottom:16px}
+.balance small{font-size:13px;font-weight:700;opacity:.7}
+.balance h1{font-size:42px;margin:4px 0}
+.balance p{font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.stat{background:#1e293b;padding:14px;border-radius:16px;text-align:center}
+.stat b{font-size:20px;color:#facc15}
+.stat p{font-size:12px;opacity:.7;margin-top:2px}
+.card{background:#1e293b;padding:16px;border-radius:16px;margin-bottom:12px}
+.card h3{font-size:16px;margin-bottom:4px}
+.card p{font-size:13px;opacity:.7;margin-bottom:12px}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer}
+.yellow{background:#facc15;color:#111}
+.green{background:#22c55e;color:white}
+.blue{background:#3b82f6;color:white}
+.purple{background:#a855f7;color:white}
+.btn:disabled{opacity:.5}
+.list{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #334155;font-size:14px}
+.list:last-child{border:none}
+input{width:100%;padding:12px;border-radius:10px;border:none;margin-bottom:10px;font-size:15px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#1e293b;display:flex;justify-content:space-around;padding:12px 0;border-top:1px solid #334155}
+.nav div{text-align:center;font-size:12px;opacity:.6}
+.nav div.active{opacity:1;color:#facc15}
+.nav span{font-size:22px;display:block}
 </style>
 </head>
 <body>
-<div class="top"><div class="logo">Daily<span>Reward</span></div><div class="level">Level 1</div></div>
-<div class="balanceCard"><p>Total Balance</p><h1 id="bal">$0.00</h1><div class="sub" id="todayLine">Today: $0.00 • Referrals: 0</div><button class="checkBtn" id="checkBtn" onclick="checkIn()">📅 Daily Check-in • Earn $0.50</button></div>
-<h2>💰 Earn</h2>
+<div class="header"><div class="logo">Daily<span>Reward</span></div><div class="live">● LIVE</div></div>
+
+<div class="balance"><small>TOTAL BALANCE</small><h1 id="bal">$0.00</h1><p>Keep earning every day!</p></div>
+
 <div class="grid">
-<div class="box" onclick="startWatch()"><div class="icon">▶️</div><h3>Watch & Earn</h3><p>$0.10 / Ad • Max 20/day<br><span id="leftTxt">20 left</span></p></div>
-<div class="box" onclick="showRef()"><div class="icon">👥</div><h3>Referral</h3><p>You + Friend = $2 Each</p></div>
+<div class="stat"><b id="streak">0</b><p>Day Streak 🔥</p></div>
+<div class="stat"><b id="ads">0</b><p>Ads Watched</p></div>
+<div class="stat"><b id="refs">0</b><p>Referrals</p></div>
+<div class="stat"><b id="total"> $0.00</b><p>Total Earned</p></div>
 </div>
-<div class="task"><h3>🎯 Daily Task</h3><p>Watch 5 Ads = Bonus $0.20 • <span id="taskTxt">0 / 5</span></p><button class="claim" id="taskBtn" onclick="claimTask()" disabled>Claim Bonus</button></div>
-<div class="nav"><div class="active">🏠<br>Home</div><div onclick="showRef()">👥<br>Referral</div><div onclick="withdraw()">💸<br>Withdraw</div><div>✅<br>Verify</div></div>
-<div class="modal" id="modal"><div class="mbox"><h2>📺 Watching Ad...</h2><div class="adbox">🎬</div><div class="timer" id="timer">15</div><div class="prog"><div id="prog"></div></div><p id="wTxt">Ngaihhruai la, ad a kal mek...</p><button class="btn" id="claimBtn" style="display:none;background:#22c55e;color:white" onclick="claim()">✅ Claim $0.10</button><button class="btn" style="background:#334155;color:white;margin-top:10px" onclick="closeM()">Close</button></div></div>
+
+<div class="card">
+<h3>📅 Daily Check-in</h3><p>Claim your daily $0.50 reward</p>
+<button class="btn yellow" id="checkBtn" onclick="checkin()">Daily Check-in • Earn $0.50</button>
+<p id="checkMsg" style="margin-top:8px;text-align:center;color:#4ade80"></p>
+</div>
+
+<div class="card">
+<h3>🎬 Watch & Earn</h3><p>Watch a short ad and earn $0.20</p>
+<button class="btn green" onclick="watchAd()">▶ Watch Ad • Earn $0.20</button>
+</div>
+
+<div class="card">
+<h3>👥 Referral Program</h3><p>Earn $1.00 for every friend who joins!</p>
+<input id="refLink" readonly value="https://t.me/DailyRewardBot?start=ref123">
+<button class="btn blue" onclick="copyRef()">Copy Referral Link</button>
+</div>
+
+<div class="card">
+<h3>💸 Withdraw</h3><p>Minimum withdrawal: $10.00</p>
+<input id="pay" placeholder="Enter your UPI / PayPal / Bank details">
+<button class="btn purple" onclick="withdraw()">Request Withdrawal</button>
+</div>
+
+<div class="card"><h3>📜 Recent Activity</h3><div id="history"><div class="list"><span>No activity yet</span><span>-</span></div></div></div>
+
+<div class="nav"><div class="active"><span>🏠</span>Home</div><div><span>🎬</span>Earn</div><div><span>👥</span>Refer</div><div><span>💰</span>Wallet</div></div>
+
 <script>
-let bal=parseFloat(localStorage.getItem('dr_bal')||'0');
+let tg = window.Telegram?.WebApp; if(tg) tg.expand();
+let bal = parseFloat(localStorage.getItem('bal')||0);
+let streak = parseInt(localStorage.getItem('streak')||0);
+let ads = parseInt(localStorage.getItem('ads')||0);
+let lastCheck = localStorage.getItem('lastCheck')||'';
+let hist = JSON.parse(localStorage.getItem('hist')||'[]');
+function save(){localStorage.setItem('bal',bal);localStorage.setItem('streak',streak);localStorage.setItem('ads',ads);localStorage.setItem('lastCheck',lastCheck);localStorage.setItem('hist',JSON.stringify(hist));render();}
+function addHist(t,a){hist.unshift(t+' - '+a); if(hist.length>5) hist.pop();}
+function render(){
+document.getElementById('bal').innerText='$'+bal.toFixed(2);
+document.getElementById('streak').innerText=streak;
+document.getElementById('ads').innerText=ads;
+document.getElementById('total').innerText='$'+bal.toFixed(2);
 let today=new Date().toDateString();
-if(localStorage.getItem('dr_day')!==today){localStorage.setItem('dr_day',today);localStorage.setItem('dr_w','0');localStorage.setItem('dr_c','0');localStorage.setItem('dr_today','0');localStorage.setItem('dr_task','0');}
-let w=parseInt(localStorage.getItem('dr_w')||'0');
-let checked=localStorage.getItem('dr_c')==='1';
-let todayEarn=parseFloat(localStorage.getItem('dr_today')||'0');
-let taskDone=localStorage.getItem('dr_task')==='1';
-function save(){localStorage.setItem('dr_bal',bal);localStorage.setItem('dr_w',w);localStorage.setItem('dr_c',checked?'1':'0');localStorage.setItem('dr_today',todayEarn);localStorage.setItem('dr_task',taskDone?'1':'0');upd();}
-function upd(){
- document.getElementById('bal').innerText='$'+bal.toFixed(2);
- document.getElementById('todayLine').innerText='Today: $'+todayEarn.toFixed(2)+' • Referrals: 0';
- document.getElementById('leftTxt').innerText=(20-w)+' left';
- document.getElementById('taskTxt').innerText=w+' / 5';
- let cb=document.getElementById('checkBtn'); if(checked){cb.disabled=true;cb.innerText='✅ Vawiin i Check-in tawh';}
- let tb=document.getElementById('taskBtn'); if(taskDone){tb.disabled=true;tb.innerText='✅ Bonus lak tawh';} else if(w>=5){tb.disabled=false;} else {tb.disabled=true;}
+if(lastCheck===today){document.getElementById('checkBtn').innerText='✅ Already Checked-in Today';document.getElementById('checkBtn').disabled=true;document.getElementById('checkMsg').innerText='You have already checked-in today. Come back tomorrow!';}
+document.getElementById('history').innerHTML = hist.length? hist.map(h=>`<div class="list"><span>${h.split(' - ')[0]}</span><b>${h.split(' - ')[1]}</b></div>`).join('') : '<div class="list"><span>No activity yet</span><span>-</span></div>';
 }
-let iv;
-function startWatch(){
- if(w>=20){alert('Vawiin atan 20 i en zo tawh!');return;}
- document.getElementById('modal').classList.add('show');
- document.getElementById('claimBtn').style.display='none';
- document.getElementById('wTxt').innerText='Ngaihhruai la, ad a kal mek...';
- let s=15;document.getElementById('timer').innerText=s;document.getElementById('prog').style.width='0%';
- clearInterval(iv);
- iv=setInterval(()=>{s--;document.getElementById('timer').innerText=s;document.getElementById('prog').style.width=((15-s)/15*100)+'%'; if(s<=0){clearInterval(iv);document.getElementById('wTxt').innerText='A zo ta! Claim hmet rawh.';document.getElementById('claimBtn').style.display='block';}},1000);
+function checkin(){
+let today=new Date().toDateString();
+if(lastCheck===today) return;
+bal+=0.50; streak++; lastCheck=today; addHist('Daily Check-in','+$0.50'); save(); alert('Success! You earned $0.50');
 }
-function claim(){bal+=0.10;todayEarn+=0.10;w++;save();closeM();alert('🎉 $0.10 i hlawh ta! Balance: $'+bal.toFixed(2));}
-function closeM(){document.getElementById('modal').classList.remove('show');clearInterval(iv);}
-function checkIn(){if(checked)return;bal+=0.50;todayEarn+=0.50;checked=true;save();alert('🎉 Check-in $0.50!');}
-function claimTask(){if(w<5||taskDone)return;bal+=0.20;todayEarn+=0.20;taskDone=true;save();alert('🎉 Task Bonus $0.20!');}
-function showRef(){alert('I Referral Link:\nhttps://t.me/DailyReward2026Bot?start=REF123\n\nI thian in i link hmangin a join chuan nangmah leh amah $2 ve ve in hmu ang!');}
-function withdraw(){if(bal<5){alert('Withdraw nan $5.00 a ngai. Tunah: $'+bal.toFixed(2));return;}alert('Withdraw: $'+bal.toFixed(2)+' - Admin in a lo en ang.');}
-upd();
+function watchAd(){
+bal+=0.20; ads++; addHist('Watched Ad','+$0.20'); save(); alert('Thanks for watching! You earned $0.20');
+}
+function copyRef(){let i=document.getElementById('refLink'); i.select(); document.execCommand('copy'); alert('Referral link copied!');}
+function withdraw(){
+if(bal<10){alert('Minimum withdrawal is $10.00. Your balance: $'+bal.toFixed(2)); return;}
+let p=document.getElementById('pay').value; if(!p){alert('Please enter payment details'); return;}
+alert('Withdrawal request of $'+bal.toFixed(2)+' sent! We will pay within 24 hours.'); bal=0; save();
+}
+render();
 </script>
 </body>
 </html>
